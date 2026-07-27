@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Voluntario {
+  id          Int          @id @default(autoincrement())
+  numero      String       @unique
+  saldo       Float        @default(0)
+  criadoEm    DateTime     @default(now())
+  transacoes  Transacao[]
+}
+
+model Transacao {
+  id           Int        @id @default(autoincrement())
+  voluntarioId Int
+  voluntario   Voluntario @relation(fields: [voluntarioId], references: [id])
+  horas        Float
+  tipo         String
+  descricao    String
+  criadoEm     DateTime   @default(now())
+}
+
+model Beneficio {
+  id          Int     @id @default(autoincrement())
+  tipo        String  @unique
+  titulo      String
+  custoHoras  Float
+}

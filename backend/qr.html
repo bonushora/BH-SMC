@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>QR Code WhatsApp</title>
+</head>
+<body style="display: flex; justify-content: center; align-items: center; height: 100vh; background: #111; color: #fff; font-family: sans-serif;">
+    <div style="text-align: center;">
+        <h2>Escaneie o QR Code - Instância: sovereign</h2>
+        <div id="loading" style="font-size: 18px; margin-top: 20px;">Carregando QR Code...</div>
+        <img id="qr-img" src="" alt="QR Code" style="display:none; margin-top: 20px; border: 8px solid #fff; border-radius: 8px; width: 280px; height: 280px;" />
+    </div>
+    <script>
+        async function loadQR() {
+            try {
+                const res = await fetch('http://localhost:8080/instance/connect/sovereign', {
+                    headers: { 'apikey': 'sua_chave_secreta_aqui' }
+                });
+                const data = await res.json();
+                if (data.base64) {
+                    document.getElementById('qr-img').src = data.base64;
+                    document.getElementById('qr-img').style.display = 'inline-block';
+                    document.getElementById('loading').style.display = 'none';
+                } else {
+                    document.getElementById('loading').innerText = 'Instância conectada ou sem QR Code no momento.';
+                }
+            } catch (e) {
+                document.getElementById('loading').innerText = 'Erro ao conectar com a API.';
+            }
+        }
+        loadQR();
+    </script>
+</body>
+</html>
