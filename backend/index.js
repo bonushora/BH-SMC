@@ -4,6 +4,7 @@ const { PrismaClient } = require('@prisma/client');
 const { PrismaPg } = require('@prisma/adapter-pg');
 const { Pool } = require('pg');
 const cors = require('cors');
+const metricsRoutes = require('./routes/metrics');
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -13,24 +14,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// 1. BI e Métricas do Ledger SECIS
-app.get('/api/bi/metrics', async (req, res) => {
-    try {
-        const totalVoluntarios = await prisma.voluntario.count();
-        const transacoes = await prisma.transacao.aggregate({ _sum: { horas: true } });
-        const totalHoras = transacoes._sum.horas || 0;
-
-        res.json({
-            market_potential: "SECIS / Salvador Pilot",
-            total_bonus_hours: totalHoras,
-            active_volunteers: totalVoluntarios,
-            mechanical_lock_status: "ARMED"
-        });
-    } catch (error) {
-        console.error("ERRO DETALHADO:", error); 
-        res.status(500).json({ error: "Erro ao buscar métricas.", details: error.message });
-    }
-});
+app.use('/api/bi', metricsRoutes(prisma));
 
 // 2. Cadastro de Voluntário
 app.post('/api/voluntarios', async (req, res) => {
