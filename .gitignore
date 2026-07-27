@@ -20,3 +20,8 @@ __pycache__/
 
 # Arquivos temporários
 *.tmp
+
+# Protótipos locais antigos
+server.py
+test_server.py
+widget.html
