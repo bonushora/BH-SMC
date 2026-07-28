@@ -5,11 +5,10 @@ const { PrismaPg } = require('@prisma/adapter-pg');
 const { Pool } = require('pg');
 const cors = require('cors');
 
-const metricsRoutes = require('./routes/metrics');
+const routes = require('./routes');
+
 const ledgerService = require('./services/ledgerService');
 const homologacaoService = require('./services/homologacaoService');
-const voluntariosRoute = require('./routes/voluntarios');
-const chatRoute = require('./routes/chat');
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -20,10 +19,8 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.use('/api/bi', metricsRoutes(prisma));
+app.use('/api', routes(prisma));
 
-app.use('/api/voluntarios', voluntariosRoute(prisma));
-app.use('/api/chat', chatRoute(prisma));
 
 
 // 3. Motor Central de Transações - Ledger Service
