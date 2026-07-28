@@ -1,4 +1,3 @@
-◇ injected env (1) from .env // tip: ⌘ multiple files { path: ['.env.local', '.env'] }
 -- CreateSchema
 CREATE SCHEMA IF NOT EXISTS "public";
 
