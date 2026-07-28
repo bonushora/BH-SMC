@@ -7,11 +7,12 @@ datasource db {
 }
 
 model Voluntario {
-  id          Int          @id @default(autoincrement())
-  numero      String       @unique
-  saldo       Float        @default(0)
-  criadoEm    DateTime     @default(now())
-  transacoes  Transacao[]
+  id             Int             @id @default(autoincrement())
+  numero         String          @unique
+  saldo          Float           @default(0)
+  criadoEm       DateTime        @default(now())
+  transacoes     Transacao[]
+  participacoes  Participacao[]
 }
 
 model Transacao {
@@ -29,4 +30,26 @@ model Beneficio {
   tipo        String  @unique
   titulo      String
   custoHoras  Float
+}
+
+model Acao {
+  id             Int             @id @default(autoincrement())
+  nome           String
+  descricao      String
+  categoria      String
+  valorBonusHora Float
+  ativo          Boolean         @default(true)
+  criadoEm       DateTime        @default(now())
+  participacoes  Participacao[]
+}
+
+model Participacao {
+  id           Int        @id @default(autoincrement())
+  voluntarioId Int
+  voluntario   Voluntario @relation(fields: [voluntarioId], references: [id])
+  acaoId       Int
+  acao         Acao       @relation(fields: [acaoId], references: [id])
+  status       String     @default("PENDENTE")
+  criadoEm     DateTime   @default(now())
+  aprovadoEm   DateTime?
 }
