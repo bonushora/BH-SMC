@@ -5,30 +5,48 @@ const transacoesRoute = require('./transacoes');
 const homologacaoRoute = require('./homologacao');
 const voluntariosRoute = require('./voluntarios');
 const chatRoute = require('./chat');
+const acoesRoute = require('./acoes');
+const participacoesRoute = require('./participacoes');
 
 
 module.exports = function(prisma) {
 
     router.use('/bi', metricsRoutes(prisma));
 
+
     router.use(
         '/transacoes',
         transacoesRoute(prisma)
     );
+
 
     router.use(
         '/homologacao',
         homologacaoRoute(prisma)
     );
 
+
     router.use(
         '/voluntarios',
         voluntariosRoute(prisma)
     );
 
+
     router.use(
         '/chat',
         chatRoute(prisma)
+    );
+
+
+    router.use(
+        '/acoes',
+        acoesRoute(prisma)
+    );
+
+
+    router.use(
+        '/participacoes',
+        participacoesRoute(prisma)
     );
 
 
