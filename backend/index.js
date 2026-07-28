@@ -6,7 +6,7 @@ const { Pool } = require('pg');
 const cors = require('cors');
 
 const metricsRoutes = require('./routes/metrics');
-const ledgerService = require('./services/ledgerService');
+const transacoesRoutes = require('./routes/transacoes');
 const homologacaoService = require('./services/homologacaoService');
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -59,42 +59,8 @@ app.post('/api/voluntarios', async (req, res) => {
 });
 
 
-// 3. Motor Central de Transações - Ledger Service
-app.post('/api/transacoes', async (req, res) => {
-
-    try {
-
-        const resultado =
-            await ledgerService.processTransaction(
-                prisma,
-                req.body
-            );
-
-
-        res.json(resultado);
-
-
-    } catch (error) {
-
-        console.error("ERRO REAL NO LEDGER:", error);
-
-
-        if (error.status) {
-
-            return res
-                .status(error.status)
-                .json(error.payload);
-
-        }
-
-
-        res.status(500).json({
-            error: "Erro ao processar transação no Ledger."
-        });
-
-    }
-
-});
+// 3. Motor Central de Transações - Transacoes Route + Ledger Service
+app.post('/api/transacoes', transacoesRoutes(prisma));
 
 
 // 4. Chat Soberano
