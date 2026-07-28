@@ -9,6 +9,7 @@ const metricsRoutes = require('./routes/metrics');
 const ledgerService = require('./services/ledgerService');
 const homologacaoService = require('./services/homologacaoService');
 const voluntariosRoute = require('./routes/voluntarios');
+const chatRoute = require('./routes/chat');
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -22,6 +23,7 @@ app.use(cors());
 app.use('/api/bi', metricsRoutes(prisma));
 
 app.use('/api/voluntarios', voluntariosRoute(prisma));
+app.use('/api/chat', chatRoute(prisma));
 
 
 // 3. Motor Central de Transações - Ledger Service
@@ -62,70 +64,7 @@ app.post('/api/transacoes', async (req, res) => {
 });
 
 
-// 4. Chat Soberano
-app.post('/api/chat/sovereign', async (req, res) => {
-
-    const { whatsapp } = req.body;
-
-
-    try {
-
-        if (!whatsapp) {
-
-            return res.status(400).json({
-                error: "Número de WhatsApp obrigatório."
-            });
-
-        }
-
-
-        const voluntario =
-            await prisma.voluntario.findUnique({
-                where: {
-                    numero: whatsapp
-                }
-            });
-
-
-        if (!voluntario) {
-
-            return res.json({
-                response:
-                "Bem-vindo ao Ledger SECIS! Você ainda não está cadastrado.",
-                opcoes:[
-                    "Cadastrar Agora"
-                ]
-            });
-
-        }
-
-
-        return res.json({
-
-            response:
-            `Seu saldo atual é de ${voluntario.saldo} bônus-horas.`,
-
-            opcoes:[
-                "Ver Benefícios Disponíveis",
-                "Voltar ao Menu"
-            ]
-
-        });
-
-
-    } catch(error) {
-
-        console.error("ERRO REAL NO CHAT:", error);
-
-
-        return res.status(500).json({
-            error:error.message
-        });
-
-    }
-
-});
-
+// 4. Chat Sovereign extraído para routes/chat.js
 
 // 5. Homologação - Homologation Service
 app.post('/api/homologacao/resgate', async (req, res) => {
