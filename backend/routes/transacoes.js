@@ -1,33 +1,18 @@
-const ledgerService = require('../services/ledgerService');
+const router = require('express').Router();
+
+const transacoesController =
+    require('../controllers/transacoesController');
+
 
 module.exports = function(prisma) {
 
-    return async function(req, res) {
 
-        try {
+    router.post(
+        '/',
+        transacoesController(prisma)
+    );
 
-            const resultado =
-                await ledgerService.processTransaction(
-                    prisma,
-                    req.body
-                );
 
-            return res.json(resultado);
-
-        } catch (error) {
-
-            console.error("ERRO ROTA TRANSACOES:", error);
-
-            if (error.status) {
-                return res
-                    .status(error.status)
-                    .json(error.payload);
-            }
-
-            return res.status(500).json({
-                error: "Erro ao processar transação no Ledger."
-            });
-        }
-    };
+    return router;
 
 };
