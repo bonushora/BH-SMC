@@ -6,8 +6,9 @@ const { Pool } = require('pg');
 const cors = require('cors');
 
 const metricsRoutes = require('./routes/metrics');
-const transacoesRoutes = require('./routes/transacoes');
+const ledgerService = require('./services/ledgerService');
 const homologacaoService = require('./services/homologacaoService');
+const voluntariosRoute = require('./routes/voluntarios');
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -20,47 +21,45 @@ app.use(cors());
 
 app.use('/api/bi', metricsRoutes(prisma));
 
+app.use('/api/voluntarios', voluntariosRoute(prisma));
 
-// 2. Cadastro de Voluntário
-app.post('/api/voluntarios', async (req, res) => {
+
+// 3. Motor Central de Transações - Ledger Service
+app.post('/api/transacoes', async (req, res) => {
+
     try {
 
-        const { numero } = req.body;
-
-        if (!numero) {
-            return res.status(400).json({
-                error: "Número obrigatório."
-            });
-        }
+        const resultado =
+            await ledgerService.processTransaction(
+                prisma,
+                req.body
+            );
 
 
-        const voluntario = await prisma.voluntario.create({
-            data: {
-                numero,
-                saldo: 10
-            }
-        });
-
-
-        res.json({
-            success: true,
-            voluntario,
-            mensagem: "Voluntário cadastrado com 10 horas iniciais!"
-        });
+        res.json(resultado);
 
 
     } catch (error) {
 
-        res.status(400).json({
-            error: "Número já cadastrado no sistema."
+        console.error("ERRO REAL NO LEDGER:", error);
+
+
+        if (error.status) {
+
+            return res
+                .status(error.status)
+                .json(error.payload);
+
+        }
+
+
+        res.status(500).json({
+            error: "Erro ao processar transação no Ledger."
         });
 
     }
+
 });
-
-
-// 3. Motor Central de Transações - Transacoes Route + Ledger Service
-app.post('/api/transacoes', transacoesRoutes(prisma));
 
 
 // 4. Chat Soberano
