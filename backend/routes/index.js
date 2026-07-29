@@ -7,11 +7,17 @@ const voluntariosRoute = require('./voluntarios');
 const chatRoute = require('./chat');
 const acoesRoute = require('./acoes');
 const participacoesRoute = require('./participacoes');
+const execucoesRoute = require('./execucoes');
+const coordenadoresRoute = require('./coordenadores');
 
 
 module.exports = function(prisma) {
 
-    router.use('/bi', metricsRoutes(prisma));
+
+    router.use(
+        '/bi',
+        metricsRoutes(prisma)
+    );
 
 
     router.use(
@@ -50,5 +56,18 @@ module.exports = function(prisma) {
     );
 
 
+    router.use(
+        '/execucoes',
+        execucoesRoute(prisma)
+    );
+
+
+    router.use(
+        '/coordenadores',
+        coordenadoresRoute(prisma)
+    );
+
+
     return router;
+
 };

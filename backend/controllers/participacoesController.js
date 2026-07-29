@@ -20,9 +20,7 @@ module.exports = function (prisma) {
 
                     });
 
-
                 return res.json(participacoes);
-
 
             } catch (error) {
 
@@ -49,10 +47,8 @@ module.exports = function (prisma) {
                     await prisma.participacao.create({
 
                         data: {
-
                             voluntarioId,
                             acaoId
-
                         }
 
                     });
@@ -65,11 +61,57 @@ module.exports = function (prisma) {
 
                 });
 
-
             } catch (error) {
 
                 return res.status(500).json({
                     error: error.message
+                });
+
+            }
+
+        },
+
+
+        aprovar: async function (req, res) {
+
+            try {
+
+                const id =
+                    Number(req.params.id);
+
+
+                const participacao =
+                    await prisma.participacao.update({
+
+                        where: {
+                            id
+                        },
+
+                        data: {
+
+                            status: 'APROVADO',
+
+                            aprovadoEm: new Date()
+
+                        }
+
+                    });
+
+
+                return res.json({
+
+                    success: true,
+
+                    participacao
+
+                });
+
+            } catch (error) {
+
+                return res.status(500).json({
+
+                    error: error.message
+
                 });
 
             }

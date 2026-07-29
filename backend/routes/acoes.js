@@ -1,13 +1,13 @@
 const router = require('express').Router();
 
-const participacoesController =
-    require('../controllers/participacoesController');
+const acoesController =
+    require('../controllers/acoesController');
 
 
 module.exports = function (prisma) {
 
     const controller =
-        participacoesController(prisma);
+        acoesController(prisma);
 
 
     router.get(
@@ -19,12 +19,6 @@ module.exports = function (prisma) {
     router.post(
         '/',
         controller.criar
-    );
-
-
-    router.patch(
-        '/:id/aprovar',
-        controller.aprovar
     );
 
 

@@ -7,49 +7,73 @@ datasource db {
 }
 
 model Voluntario {
-  id             Int             @id @default(autoincrement())
-  numero         String          @unique
-  saldo          Float           @default(0)
-  criadoEm       DateTime        @default(now())
-  transacoes     Transacao[]
-  participacoes  Participacao[]
+  id            Int            @id @default(autoincrement())
+  numero        String         @unique
+  saldo         Float          @default(0)
+  criadoEm      DateTime       @default(now())
+  participacoes Participacao[]
+  transacoes    Transacao[]
 }
 
 model Transacao {
   id           Int        @id @default(autoincrement())
   voluntarioId Int
-  voluntario   Voluntario @relation(fields: [voluntarioId], references: [id])
   horas        Float
   tipo         String
   descricao    String
   criadoEm     DateTime   @default(now())
+  voluntario   Voluntario @relation(fields: [voluntarioId], references: [id])
 }
 
 model Beneficio {
-  id          Int     @id @default(autoincrement())
-  tipo        String  @unique
-  titulo      String
-  custoHoras  Float
+  id         Int    @id @default(autoincrement())
+  tipo       String @unique
+  titulo     String
+  custoHoras Float
+}
+
+model Coordenador {
+  id       Int      @id @default(autoincrement())
+  nome     String
+  telefone String?  @unique
+  criadoEm DateTime @default(now())
+  acoes    Acao[]
 }
 
 model Acao {
-  id             Int             @id @default(autoincrement())
+  id             Int            @id @default(autoincrement())
   nome           String
   descricao      String
   categoria      String
   valorBonusHora Float
-  ativo          Boolean         @default(true)
-  criadoEm       DateTime        @default(now())
+  ativo          Boolean        @default(true)
+  criadoEm       DateTime       @default(now())
+  coordenadorId  Int?
+  coordenador    Coordenador?   @relation(fields: [coordenadorId], references: [id])
   participacoes  Participacao[]
 }
 
 model Participacao {
-  id           Int        @id @default(autoincrement())
+  id           Int                   @id @default(autoincrement())
   voluntarioId Int
-  voluntario   Voluntario @relation(fields: [voluntarioId], references: [id])
   acaoId       Int
-  acao         Acao       @relation(fields: [acaoId], references: [id])
-  status       String     @default("PENDENTE")
-  criadoEm     DateTime   @default(now())
+  status       String                @default("PENDENTE")
+  criadoEm     DateTime              @default(now())
   aprovadoEm   DateTime?
+  execucao     ExecucaoParticipacao?
+  acao         Acao                  @relation(fields: [acaoId], references: [id])
+  voluntario   Voluntario            @relation(fields: [voluntarioId], references: [id])
+}
+
+model ExecucaoParticipacao {
+  id              Int          @id @default(autoincrement())
+  participacaoId  Int          @unique
+  checkinEm       DateTime?
+  checkoutEm      DateTime?
+  horasRealizadas Float        @default(0)
+  latitude        Float?
+  longitude       Float?
+  status          String       @default("INICIADA")
+  criadoEm        DateTime     @default(now())
+  participacao    Participacao @relation(fields: [participacaoId], references: [id])
 }
