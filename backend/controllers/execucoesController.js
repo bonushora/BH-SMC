@@ -100,99 +100,123 @@ module.exports = function (prisma) {
 
             try {
 
-
                 const id =
                     Number(req.params.id);
 
 
+                const resultado =
+                    await prisma.$transaction(async (tx) => {
 
-                const execucao =
-                    await prisma.execucaoParticipacao.findUnique({
 
-                        where:{
-                            id
-                        },
+                        const execucao =
+                            await tx.execucaoParticipacao.findUnique({
 
-                        include:{
-                            participacao:{
+                                where:{
+                                    id
+                                },
+
                                 include:{
-                                    voluntario:true,
-                                    acao:true
+                                    participacao:{
+                                        include:{
+                                            voluntario:true,
+                                            acao:true
+                                        }
+                                    }
+                                }
+
+                            });
+
+
+
+                        if(!execucao){
+
+                            throw new Error(
+                                "Execução não encontrada"
+                            );
+
+                        }
+
+
+
+                        if(execucao.status === "APROVADA"){
+
+                            throw new Error(
+                                "Execução já aprovada."
+                            );
+
+                        }
+
+
+
+                        const horas =
+                            execucao.participacao.acao.valorBonusHora;
+
+
+
+                        const voluntarioId =
+                            execucao.participacao.voluntarioId;
+
+
+
+                        await tx.voluntario.update({
+
+                            where:{
+                                id: voluntarioId
+                            },
+
+                            data:{
+                                saldo:{
+                                    increment: horas
                                 }
                             }
-                        }
 
-                    });
-
-
-
-                if(!execucao){
-
-                    return res.status(404).json({
-                        error:"Execução não encontrada"
-                    });
-
-                }
+                        });
 
 
 
-                const horas =
-                    execucao.participacao.acao.valorBonusHora;
+                        const transacao =
+                            await tx.transacao.create({
+
+                                data:{
+
+                                    voluntarioId,
+
+                                    execucaoId:id,
+
+                                    horas,
+
+                                    tipo:"CREDITO_ACAO",
+
+                                    descricao:
+                                    "Crédito por participação em ação BônusHora"
+
+                                }
+
+                            });
 
 
 
-                const voluntarioId =
-                    execucao.participacao.voluntarioId;
+                        await tx.execucaoParticipacao.update({
+
+                            where:{
+                                id
+                            },
+
+                            data:{
+                                status:"APROVADA"
+                            }
+
+                        });
 
 
 
-                await prisma.voluntario.update({
-
-                    where:{
-                        id: voluntarioId
-                    },
-
-                    data:{
-                        saldo:{
-                            increment: horas
-                        }
-                    }
-
-                });
-
-
-
-                const transacao =
-                    await prisma.transacao.create({
-
-                        data:{
-
-                            voluntarioId,
-
+                        return {
                             horas,
+                            transacao
+                        };
 
-                            tipo:"CREDITO_ACAO",
-
-                            descricao:
-                            "Crédito por participação em ação BônusHora"
-
-                        }
 
                     });
-
-
-
-                await prisma.execucaoParticipacao.update({
-
-                    where:{
-                        id
-                    },
-
-                    data:{
-                        status:"APROVADA"
-                    }
-
-                });
 
 
 
@@ -200,9 +224,9 @@ module.exports = function (prisma) {
 
                     success:true,
 
-                    credito:horas,
+                    credito:resultado.horas,
 
-                    transacao
+                    transacao:resultado.transacao
 
                 });
 
@@ -210,8 +234,10 @@ module.exports = function (prisma) {
 
             }catch(error){
 
-                res.status(500).json({
+                res.status(400).json({
+
                     error:error.message
+
                 });
 
             }
