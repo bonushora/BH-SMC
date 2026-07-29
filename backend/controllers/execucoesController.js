@@ -70,8 +70,6 @@ module.exports = function (prisma) {
 
                             checkoutEm: new Date(),
 
-                            horasRealizadas: 0.06,
-
                             status: "FINALIZADA"
 
                         }
