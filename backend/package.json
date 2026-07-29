@@ -4,8 +4,8 @@
   "description": "BH-SMC Backend",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "node index.js",
+    "start": "node scripts/start.js",
+    "dev": "node scripts/start.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -14,7 +14,7 @@
   "type": "commonjs",
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.0",
-    "@prisma/client": "^7.9.0",
+    "@prisma/client": "^7.9.1",
     "axios": "^1.18.1",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
@@ -22,6 +22,6 @@
     "pg": "^8.22.0"
   },
   "devDependencies": {
-    "prisma": "^7.9.0"
+    "prisma": "^7.9.1"
   }
 }
