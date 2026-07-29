@@ -9,6 +9,7 @@ const acoesRoute = require('./acoes');
 const participacoesRoute = require('./participacoes');
 const execucoesRoute = require('./execucoes');
 const coordenadoresRoute = require('./coordenadores');
+const healthRoute = require('./health');
 
 
 module.exports = function(prisma) {
@@ -68,6 +69,14 @@ module.exports = function(prisma) {
     );
 
 
+    
+    router.use(
+        '/health',
+        healthRoute(prisma)
+    );
+
+
     return router;
+
 
 };
