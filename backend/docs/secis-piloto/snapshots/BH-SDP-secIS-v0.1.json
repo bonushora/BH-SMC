@@ -1,0 +1,20 @@
+{
+  "nome_do_projeto": "BH-SMC",
+  "versao_do_protocolo": "BH-SDP v2.2",
+  "tipo_de_arquitetura": "Backend API REST + PostgreSQL + Prisma",
+  "fase_atual": "Piloto SECIS Salvador",
+  "nivel_de_risco": "Controlado",
+  "branch": "release/secis-piloto",
+  "tag_referencia": "secis-piloto-v0.1",
+  "commit_referencia": "ec0aa52",
+  "status_dos_testes": "Homologado",
+  "componentes_validados": [
+    "Chat Soberano",
+    "Health Check",
+    "BI Metrics",
+    "Ledger BônusHora",
+    "Consulta de Benefícios",
+    "Resgate Homologado"
+  ],
+  "proximo_passo": "Demonstração controlada SECIS Salvador"
+}
