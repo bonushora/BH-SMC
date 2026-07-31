@@ -1,29 +1,26 @@
 const chatCommands =
     require('../services/chat/chatCommands');
 
-
 const chatResponse =
     require('../services/chat/chatResponse');
 
+const homologacaoService =
+    require('../services/homologacaoService');
 
 
 module.exports = function(prisma) {
 
     return async function(req, res) {
 
-
         const identificador =
             req.body.identificador ||
             req.body.whatsapp;
-
 
         const canal =
             req.body.canal ||
             "whatsapp";
 
-
         try {
-
 
             if (!identificador) {
 
@@ -37,12 +34,10 @@ module.exports = function(prisma) {
             }
 
 
-
             const comando =
                 chatCommands.interpretar(
                     req.body.mensagem || ""
                 );
-
 
 
             const comandosPermitidos = [
@@ -52,10 +47,10 @@ module.exports = function(prisma) {
                 "CONSULTAR_DASHBOARD",
                 "CONSULTAR_ACOES",
                 "CONSULTAR_BENEFICIOS",
-                "CONSULTAR_HISTORICO"
+                "CONSULTAR_HISTORICO",
+                "RESGATAR_BENEFICIO"
 
             ];
-
 
 
             if (
@@ -76,7 +71,6 @@ module.exports = function(prisma) {
             }
 
 
-
             if (
                 comando === "MENU_PRINCIPAL"
             ) {
@@ -92,11 +86,10 @@ module.exports = function(prisma) {
             }
 
 
-
             const voluntario =
                 await prisma.voluntario.findUnique({
 
-                    where: {
+                    where:{
 
                         numero:
                         identificador
@@ -104,7 +97,6 @@ module.exports = function(prisma) {
                     }
 
                 });
-
 
 
             if (!voluntario) {
@@ -121,11 +113,9 @@ module.exports = function(prisma) {
             }
 
 
-
             if (
                 comando === "CONSULTAR_SALDO"
             ) {
-
 
                 return res.json({
 
@@ -136,7 +126,6 @@ module.exports = function(prisma) {
                         voluntario.numero
                     },
 
-
                     ...chatResponse.saldo(voluntario)
 
                 });
@@ -144,11 +133,9 @@ module.exports = function(prisma) {
             }
 
 
-
             if (
                 comando === "CONSULTAR_DASHBOARD"
             ) {
-
 
                 const participacoes =
                     await prisma.participacao.count({
@@ -159,7 +146,6 @@ module.exports = function(prisma) {
                         }
 
                     });
-
 
 
                 const transacoes =
@@ -173,7 +159,6 @@ module.exports = function(prisma) {
                     });
 
 
-
                 return res.json({
 
                     canal,
@@ -182,7 +167,6 @@ module.exports = function(prisma) {
                         numero:
                         voluntario.numero
                     },
-
 
                     ...chatResponse.dashboard({
 
@@ -200,11 +184,9 @@ module.exports = function(prisma) {
             }
 
 
-
             if (
                 comando === "CONSULTAR_ACOES"
             ) {
-
 
                 const lista =
                     await prisma.participacao.findMany({
@@ -221,7 +203,6 @@ module.exports = function(prisma) {
                     });
 
 
-
                 return res.json({
 
                     canal,
@@ -233,11 +214,9 @@ module.exports = function(prisma) {
             }
 
 
-
             if (
                 comando === "CONSULTAR_HISTORICO"
             ) {
-
 
                 const lista =
                     await prisma.participacao.findMany({
@@ -254,7 +233,6 @@ module.exports = function(prisma) {
                     });
 
 
-
                 return res.json({
 
                     canal,
@@ -266,32 +244,68 @@ module.exports = function(prisma) {
             }
 
 
-
             if (
                 comando === "CONSULTAR_BENEFICIOS"
             ) {
+
+                const beneficios =
+                    await prisma.beneficio.findMany({
+
+                        orderBy:{
+                            id:"asc"
+                        }
+
+                    });
 
 
                 return res.json({
 
                     canal,
 
-                    ...chatResponse.beneficios([])
+                    ...chatResponse.beneficios(beneficios)
 
                 });
 
             }
 
 
+            if (
+                comando === "RESGATAR_BENEFICIO"
+            ) {
+
+                const beneficios =
+                    await prisma.beneficio.findMany({
+
+                        orderBy:{
+                            id:"asc"
+                        }
+
+                    });
+
+
+                return res.json({
+
+                    canal,
+
+                    titulo:
+                    "Escolha um benefício",
+
+                    beneficios,
+
+                    mensagem:
+                    "Envie o tipo do benefício desejado (ex.: PARCERIA_LOCAL)."
+
+                });
+
+            }
+
 
         } catch(error) {
-
 
             console.error(
                 "ERRO CONTROLLER CHAT:",
                 error
             );
-
 
             return res.status(500).json({
 
@@ -299,7 +313,6 @@ module.exports = function(prisma) {
                 error.message
 
             });
-
 
         }
 

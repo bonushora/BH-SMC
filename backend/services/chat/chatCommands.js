@@ -71,6 +71,17 @@ module.exports = {
         }
 
 
+        if (
+            texto === "resgatar" ||
+            texto === "resgatar beneficio" ||
+            texto === "resgatar benefício"
+        ) {
+
+            return "RESGATAR_BENEFICIO";
+
+        }
+
+
         return "MENU_PRINCIPAL";
 
     }
