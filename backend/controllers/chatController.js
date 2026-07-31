@@ -2,15 +2,25 @@ module.exports = function(prisma) {
 
     return async function(req, res) {
 
-        const { whatsapp } = req.body;
+        const identificador =
+            req.body.identificador ||
+            req.body.whatsapp;
+
+
+        const canal =
+            req.body.canal ||
+            "whatsapp";
 
 
         try {
 
-            if (!whatsapp) {
+            if (!identificador) {
 
                 return res.status(400).json({
-                    error: "Número de WhatsApp obrigatório."
+
+                    error:
+                    "Identificador do usuário obrigatório."
+
                 });
 
             }
@@ -20,7 +30,9 @@ module.exports = function(prisma) {
                 await prisma.voluntario.findUnique({
 
                     where: {
-                        numero: whatsapp
+
+                        numero: identificador
+
                     }
 
                 });
@@ -30,11 +42,15 @@ module.exports = function(prisma) {
 
                 return res.json({
 
+                    canal,
+
                     response:
                     "Bem-vindo ao Ledger SECIS! Você ainda não está cadastrado.",
 
                     opcoes:[
+
                         "Cadastrar Agora"
+
                     ]
 
                 });
@@ -44,12 +60,26 @@ module.exports = function(prisma) {
 
             return res.json({
 
+                canal,
+
+                usuario: {
+
+                    numero:
+                    voluntario.numero
+
+                },
+
                 response:
                 `Seu saldo atual é de ${voluntario.saldo} bônus-horas.`,
 
                 opcoes:[
+
                     "Ver Benefícios Disponíveis",
+
+                    "Ver Dashboard",
+
                     "Voltar ao Menu"
+
                 ]
 
             });
@@ -59,13 +89,18 @@ module.exports = function(prisma) {
 
 
             console.error(
+
                 "ERRO CONTROLLER CHAT:",
+
                 error
+
             );
 
 
             return res.status(500).json({
+
                 error:error.message
+
             });
 
 
