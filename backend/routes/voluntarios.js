@@ -6,10 +6,25 @@ const voluntariosController =
 
 module.exports = function(prisma) {
 
+    const controller =
+        voluntariosController(prisma);
+
 
     router.post(
         '/',
-        voluntariosController(prisma)
+        controller.criar
+    );
+
+
+    router.get(
+        '/dashboard',
+        controller.listarDashboard
+    );
+
+
+    router.get(
+        '/dashboard/:numero',
+        controller.dashboard
     );
 
 
