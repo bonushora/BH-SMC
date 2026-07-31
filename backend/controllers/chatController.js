@@ -45,9 +45,20 @@ module.exports = function(prisma) {
 
 
 
+            const comandosPermitidos = [
+
+                "CONSULTAR_SALDO",
+                "CONSULTAR_DASHBOARD",
+                "CONSULTAR_ACOES",
+                "CONSULTAR_BENEFICIOS",
+                "CONSULTAR_HISTORICO"
+
+            ];
+
+
+
             if (
-                comando !== "CONSULTAR_SALDO" &&
-                comando !== "CONSULTAR_DASHBOARD"
+                !comandosPermitidos.includes(comando)
             ) {
 
                 return res.json({
@@ -55,7 +66,7 @@ module.exports = function(prisma) {
                     canal,
 
                     response:
-                    "Comando recebido. Em breve novas funcionalidades estarão disponíveis.",
+                    "Comando não reconhecido.",
 
                     comando
 
@@ -86,13 +97,7 @@ module.exports = function(prisma) {
                     canal,
 
                     response:
-                    "Bem-vindo ao Ledger SECIS! Você ainda não está cadastrado.",
-
-                    opcoes:[
-
-                        "Cadastrar Agora"
-
-                    ]
+                    "Bem-vindo ao Ledger SECIS! Você ainda não está cadastrado."
 
                 });
 
@@ -109,26 +114,13 @@ module.exports = function(prisma) {
 
                     canal,
 
-                    usuario: {
-
+                    usuario:{
                         numero:
                         voluntario.numero
-
                     },
 
 
-                    ...chatResponse.saldo(voluntario),
-
-
-                    opcoes:[
-
-                        "Ver Benefícios Disponíveis",
-
-                        "Ver Dashboard",
-
-                        "Voltar ao Menu"
-
-                    ]
+                    ...chatResponse.saldo(voluntario)
 
                 });
 
@@ -145,10 +137,8 @@ module.exports = function(prisma) {
                     await prisma.participacao.count({
 
                         where:{
-
                             voluntarioId:
                             voluntario.id
-
                         }
 
                     });
@@ -159,10 +149,8 @@ module.exports = function(prisma) {
                     await prisma.transacao.count({
 
                         where:{
-
                             voluntarioId:
                             voluntario.id
-
                         }
 
                     });
@@ -173,11 +161,9 @@ module.exports = function(prisma) {
 
                     canal,
 
-                    usuario: {
-
+                    usuario:{
                         numero:
                         voluntario.numero
-
                     },
 
 
@@ -198,15 +184,95 @@ module.exports = function(prisma) {
 
 
 
+            if (
+                comando === "CONSULTAR_ACOES"
+            ) {
+
+
+                const lista =
+                    await prisma.participacao.findMany({
+
+                        where:{
+                            voluntarioId:
+                            voluntario.id
+                        },
+
+                        include:{
+                            acao:true
+                        }
+
+                    });
+
+
+
+                return res.json({
+
+                    canal,
+
+                    ...chatResponse.acoes(lista)
+
+                });
+
+            }
+
+
+
+            if (
+                comando === "CONSULTAR_HISTORICO"
+            ) {
+
+
+                const lista =
+                    await prisma.participacao.findMany({
+
+                        where:{
+                            voluntarioId:
+                            voluntario.id
+                        },
+
+                        orderBy:{
+                            id:"desc"
+                        }
+
+                    });
+
+
+
+                return res.json({
+
+                    canal,
+
+                    ...chatResponse.historico(lista)
+
+                });
+
+            }
+
+
+
+            if (
+                comando === "CONSULTAR_BENEFICIOS"
+            ) {
+
+
+                return res.json({
+
+                    canal,
+
+                    ...chatResponse.beneficios([])
+
+                });
+
+            }
+
+
+
         } catch(error) {
 
 
             console.error(
-
                 "ERRO CONTROLLER CHAT:",
-
                 error
-
             );
 
 
