@@ -1,5 +1,64 @@
 module.exports = {
 
+    menu: function(){
+
+        return {
+
+            titulo:
+            "Menu BônusHora",
+
+            opcoes:[
+
+                {
+                    texto:
+                    "Meu saldo",
+
+                    comando:
+                    "CONSULTAR_SALDO"
+                },
+
+                {
+                    texto:
+                    "Meu dashboard",
+
+                    comando:
+                    "CONSULTAR_DASHBOARD"
+                },
+
+                {
+                    texto:
+                    "Minhas ações",
+
+                    comando:
+                    "CONSULTAR_ACOES"
+                },
+
+                {
+                    texto:
+                    "Meu histórico",
+
+                    comando:
+                    "CONSULTAR_HISTORICO"
+                },
+
+                {
+                    texto:
+                    "Benefícios",
+
+                    comando:
+                    "CONSULTAR_BENEFICIOS"
+                }
+
+            ],
+
+            mensagem:
+            "Escolha uma opção para continuar."
+
+        };
+
+    },
+
+
     saldo: function(voluntario){
 
         return {

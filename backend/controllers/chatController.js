@@ -47,6 +47,7 @@ module.exports = function(prisma) {
 
             const comandosPermitidos = [
 
+                "MENU_PRINCIPAL",
                 "CONSULTAR_SALDO",
                 "CONSULTAR_DASHBOARD",
                 "CONSULTAR_ACOES",
@@ -69,6 +70,22 @@ module.exports = function(prisma) {
                     "Comando não reconhecido.",
 
                     comando
+
+                });
+
+            }
+
+
+
+            if (
+                comando === "MENU_PRINCIPAL"
+            ) {
+
+                return res.json({
+
+                    canal,
+
+                    ...chatResponse.menu()
 
                 });
 
