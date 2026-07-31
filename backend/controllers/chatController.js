@@ -2,9 +2,15 @@ const chatCommands =
     require('../services/chat/chatCommands');
 
 
+const chatResponse =
+    require('../services/chat/chatResponse');
+
+
+
 module.exports = function(prisma) {
 
     return async function(req, res) {
+
 
         const identificador =
             req.body.identificador ||
@@ -31,86 +37,18 @@ module.exports = function(prisma) {
             }
 
 
+
             const comando =
                 chatCommands.interpretar(
                     req.body.mensagem || ""
                 );
 
 
+
             if (
-                comando !== "CONSULTAR_SALDO"
+                comando !== "CONSULTAR_SALDO" &&
+                comando !== "CONSULTAR_DASHBOARD"
             ) {
-
-
-                if (
-                    comando === "CONSULTAR_DASHBOARD"
-                ) {
-
-
-                    const voluntario =
-                        await prisma.voluntario.findUnique({
-
-                            where:{
-                                numero: identificador
-                            },
-
-                            include:{
-
-                                transacoes:true,
-
-                                participacoes:true
-
-                            }
-
-                        });
-
-
-                    if(!voluntario){
-
-                        return res.json({
-
-                            canal,
-
-                            response:
-                            "Voluntário não encontrado."
-
-                        });
-
-                    }
-
-
-                    return res.json({
-
-                        canal,
-
-                        usuario:{
-
-                            numero:
-                            voluntario.numero
-
-                        },
-
-                        dashboard:{
-
-                            saldoAtual:
-                            voluntario.saldo,
-
-                            participacoes:
-                            voluntario.participacoes.length,
-
-                            transacoes:
-                            voluntario.transacoes.length
-
-                        },
-
-                        response:
-                        "Dashboard do voluntário carregado."
-
-                    });
-
-
-                }
-
 
                 return res.json({
 
@@ -162,31 +100,101 @@ module.exports = function(prisma) {
 
 
 
-            return res.json({
+            if (
+                comando === "CONSULTAR_SALDO"
+            ) {
 
-                canal,
 
-                usuario: {
+                return res.json({
 
-                    numero:
-                    voluntario.numero
+                    canal,
 
-                },
+                    usuario: {
 
-                response:
-                `Seu saldo atual é de ${voluntario.saldo} bônus-horas.`,
+                        numero:
+                        voluntario.numero
 
-                opcoes:[
+                    },
 
-                    "Ver Benefícios Disponíveis",
 
-                    "Ver Dashboard",
+                    ...chatResponse.saldo(voluntario),
 
-                    "Voltar ao Menu"
 
-                ]
+                    opcoes:[
 
-            });
+                        "Ver Benefícios Disponíveis",
+
+                        "Ver Dashboard",
+
+                        "Voltar ao Menu"
+
+                    ]
+
+                });
+
+            }
+
+
+
+            if (
+                comando === "CONSULTAR_DASHBOARD"
+            ) {
+
+
+                const participacoes =
+                    await prisma.participacao.count({
+
+                        where:{
+
+                            voluntarioId:
+                            voluntario.id
+
+                        }
+
+                    });
+
+
+
+                const transacoes =
+                    await prisma.transacao.count({
+
+                        where:{
+
+                            voluntarioId:
+                            voluntario.id
+
+                        }
+
+                    });
+
+
+
+                return res.json({
+
+                    canal,
+
+                    usuario: {
+
+                        numero:
+                        voluntario.numero
+
+                    },
+
+
+                    ...chatResponse.dashboard({
+
+                        saldoAtual:
+                        voluntario.saldo,
+
+                        participacoes,
+
+                        transacoes
+
+                    })
+
+                });
+
+            }
 
 
 
