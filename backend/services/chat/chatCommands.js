@@ -9,6 +9,18 @@ module.exports = {
 
 
         if (
+            texto === "menu" ||
+            texto === "inicio" ||
+            texto === "início" ||
+            texto === "voltar"
+        ) {
+
+            return "MENU_PRINCIPAL";
+
+        }
+
+
+        if (
             texto === "saldo" ||
             texto === "ver saldo"
         ) {
