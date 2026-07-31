@@ -10,6 +10,7 @@ const participacoesRoute = require('./participacoes');
 const execucoesRoute = require('./execucoes');
 const coordenadoresRoute = require('./coordenadores');
 const healthRoute = require('./health');
+const ledgerRoute = require('./ledger');
 
 
 module.exports = function(prisma) {
@@ -75,6 +76,11 @@ module.exports = function(prisma) {
         healthRoute(prisma)
     );
 
+
+    router.use(
+        '/ledger',
+        ledgerRoute(prisma)
+    );
 
     return router;
 

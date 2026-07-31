@@ -3,6 +3,48 @@ module.exports = function (prisma) {
     return {
 
 
+        listar: async function(req,res){
+
+            try {
+
+                const execucoes =
+                    await prisma.execucaoParticipacao.findMany({
+
+                        include:{
+
+                            participacao:{
+                                include:{
+                                    voluntario:true,
+                                    acao:true
+                                }
+                            },
+
+                            transacoes:true
+
+                        },
+
+                        orderBy:{
+                            criadoEm:"desc"
+                        }
+
+                    });
+
+
+                res.json(execucoes);
+
+
+            }catch(error){
+
+                res.status(500).json({
+                    error:error.message
+                });
+
+            }
+
+        },
+
+
+
         checkin: async function (req, res) {
 
             try {
@@ -12,6 +54,27 @@ module.exports = function (prisma) {
                     latitude,
                     longitude
                 } = req.body;
+
+
+                const existente =
+                    await prisma.execucaoParticipacao.findUnique({
+
+                        where:{
+                            participacaoId
+                        }
+
+                    });
+
+
+                if(existente){
+
+                    return res.status(409).json({
+
+                        error:"Esta participação já possui uma execução."
+
+                    });
+
+                }
 
 
                 const execucao =
@@ -56,21 +119,72 @@ module.exports = function (prisma) {
 
             try {
 
-                const id = Number(req.params.id);
+                const id =
+                    Number(req.params.id);
+
+
+                const execucaoAtual =
+                    await prisma.execucaoParticipacao.findUnique({
+
+                        where:{
+                            id
+                        }
+
+                    });
+
+
+                if(!execucaoAtual){
+
+                    return res.status(404).json({
+
+                        error:"Execução não encontrada."
+
+                    });
+
+                }
+
+
+                if(execucaoAtual.status === "FINALIZADA" ||
+                   execucaoAtual.status === "APROVADA"){
+
+                    return res.status(400).json({
+
+                        error:"Execução já finalizada."
+
+                    });
+
+                }
+
+
+                const checkoutEm =
+                    new Date();
+
+
+                const horasRealizadas =
+                    Number(
+                        (
+                            (checkoutEm - execucaoAtual.checkinEm)
+                            / 1000
+                            / 60
+                            / 60
+                        ).toFixed(2)
+                    );
 
 
                 const execucao =
                     await prisma.execucaoParticipacao.update({
 
-                        where: {
+                        where:{
                             id
                         },
 
-                        data: {
+                        data:{
 
-                            checkoutEm: new Date(),
+                            checkoutEm,
 
-                            status: "FINALIZADA"
+                            horasRealizadas,
+
+                            status:"FINALIZADA"
 
                         }
 
@@ -78,23 +192,25 @@ module.exports = function (prisma) {
 
 
                 res.json({
+
                     success:true,
+
                     execucao
+
                 });
 
 
-            } catch(error){
+            }catch(error){
 
                 res.status(500).json({
+
                     error:error.message
+
                 });
 
             }
 
         },
-
-
-
 
         aprovar: async function(req,res){
 

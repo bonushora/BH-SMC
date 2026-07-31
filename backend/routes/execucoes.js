@@ -12,6 +12,12 @@ module.exports = function(prisma){
 
 
 
+    router.get(
+        '/',
+        controller.listar
+    );
+
+
     router.post(
         '/checkin',
         controller.checkin

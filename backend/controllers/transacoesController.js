@@ -1,41 +1,67 @@
 const ledgerService = require('../services/ledgerService');
 
-module.exports = function(prisma) {
+module.exports = function (prisma) {
 
-    return async function(req, res) {
+    return {
 
-        try {
+        listar: async function(req,res){
 
-            const resultado =
-                await ledgerService.processTransaction(
-                    prisma,
-                    req.body
-                );
+            try{
 
-            return res.json(resultado);
+                const transacoes =
+                    await prisma.transacao.findMany({
 
+                        include:{
+                            voluntario:true,
+                            execucao:true
+                        },
 
-        } catch (error) {
+                        orderBy:{
+                            criadoEm:"desc"
+                        }
 
-            console.error(
-                "ERRO CONTROLLER TRANSACOES:",
-                error
-            );
+                    });
 
+                res.json(transacoes);
 
-            if (error.status) {
+            }catch(error){
 
-                return res
-                    .status(error.status)
-                    .json(error.payload);
+                res.status(500).json({
+                    error:error.message
+                });
 
             }
 
+        },
 
-            return res.status(500).json({
-                error:
-                "Erro ao processar transação no Ledger."
-            });
+
+        criar: async function(req,res){
+
+            try{
+
+                const resultado =
+                    await ledgerService.processTransaction(
+                        prisma,
+                        req.body
+                    );
+
+                res.json(resultado);
+
+            }catch(error){
+
+                if(error.status){
+
+                    return res
+                        .status(error.status)
+                        .json(error.payload);
+
+                }
+
+                res.status(500).json({
+                    error:"Erro ao processar transação no Ledger."
+                });
+
+            }
 
         }
 

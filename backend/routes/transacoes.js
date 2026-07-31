@@ -1,17 +1,22 @@
-const router = require('express').Router();
+const router = require("express").Router();
 
-const transacoesController =
-    require('../controllers/transacoesController');
+const controllerFactory =
+require("../controllers/transacoesController");
 
+module.exports = function(prisma){
 
-module.exports = function(prisma) {
+    const controller =
+        controllerFactory(prisma);
 
-
-    router.post(
-        '/',
-        transacoesController(prisma)
+    router.get(
+        "/",
+        controller.listar
     );
 
+    router.post(
+        "/",
+        controller.criar
+    );
 
     return router;
 
