@@ -1,6 +1,11 @@
+const chatGateway =
+    require('../services/chatGateway');
+
+
 module.exports = function(prisma) {
 
     return async function(req, res) {
+
 
         const identificador =
             req.body.identificador ||
@@ -14,6 +19,7 @@ module.exports = function(prisma) {
 
         try {
 
+
             if (!identificador) {
 
                 return res.status(400).json({
@@ -26,16 +32,48 @@ module.exports = function(prisma) {
             }
 
 
+            const comando =
+                chatGateway.interpretarMensagem({
+
+                    canal,
+
+                    identificador,
+
+                    mensagem:
+                    req.body.mensagem || ""
+
+                });
+
+
+
             const voluntario =
                 await prisma.voluntario.findUnique({
 
                     where: {
 
-                        numero: identificador
+                        numero:
+                        identificador
+
+                    },
+
+                    include: {
+
+                        participacoes: {
+
+                            include: {
+
+                                acao:true
+
+                            }
+
+                        },
+
+                        transacoes:true
 
                     }
 
                 });
+
 
 
             if (!voluntario) {
@@ -58,31 +96,96 @@ module.exports = function(prisma) {
             }
 
 
-            return res.json({
 
-                canal,
+            switch(comando.comando) {
 
-                usuario: {
 
-                    numero:
-                    voluntario.numero
+                case "CONSULTAR_SALDO":
 
-                },
 
-                response:
-                `Seu saldo atual é de ${voluntario.saldo} bônus-horas.`,
+                    return res.json({
 
-                opcoes:[
+                        canal,
 
-                    "Ver Benefícios Disponíveis",
+                        usuario: {
 
-                    "Ver Dashboard",
+                            numero:
+                            voluntario.numero
 
-                    "Voltar ao Menu"
+                        },
 
-                ]
+                        response:
+                        `Seu saldo atual é de ${voluntario.saldo} bônus-horas.`,
 
-            });
+                        opcoes:[
+
+                            "Ver Benefícios Disponíveis",
+
+                            "Ver Dashboard",
+
+                            "Voltar ao Menu"
+
+                        ]
+
+                    });
+
+
+
+                case "CONSULTAR_DASHBOARD":
+
+
+                    return res.json({
+
+                        canal,
+
+                        usuario: {
+
+                            numero:
+                            voluntario.numero
+
+                        },
+
+                        dashboard: {
+
+                            saldoAtual:
+                            voluntario.saldo,
+
+
+                            participacoes:
+                            voluntario.participacoes.length,
+
+
+                            transacoes:
+                            voluntario.transacoes.length
+
+                        },
+
+
+                        response:
+                        "Dashboard do voluntário carregado."
+
+                    });
+
+
+
+                default:
+
+
+                    return res.json({
+
+                        canal,
+
+                        response:
+                        "Comando recebido. Em breve novas funcionalidades estarão disponíveis.",
+
+                        comando:
+                        comando.comando
+
+                    });
+
+
+            }
+
 
 
         } catch(error) {
@@ -99,7 +202,8 @@ module.exports = function(prisma) {
 
             return res.status(500).json({
 
-                error:error.message
+                error:
+                error.message
 
             });
 
