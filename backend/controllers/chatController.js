@@ -1,11 +1,10 @@
-const chatGateway =
-    require('../services/chatGateway');
+const chatCommands =
+    require('../services/chat/chatCommands');
 
 
 module.exports = function(prisma) {
 
     return async function(req, res) {
-
 
         const identificador =
             req.body.identificador ||
@@ -33,16 +32,98 @@ module.exports = function(prisma) {
 
 
             const comando =
-                chatGateway.interpretarMensagem({
+                chatCommands.interpretar(
+                    req.body.mensagem || ""
+                );
+
+
+            if (
+                comando !== "CONSULTAR_SALDO"
+            ) {
+
+
+                if (
+                    comando === "CONSULTAR_DASHBOARD"
+                ) {
+
+
+                    const voluntario =
+                        await prisma.voluntario.findUnique({
+
+                            where:{
+                                numero: identificador
+                            },
+
+                            include:{
+
+                                transacoes:true,
+
+                                participacoes:true
+
+                            }
+
+                        });
+
+
+                    if(!voluntario){
+
+                        return res.json({
+
+                            canal,
+
+                            response:
+                            "Voluntário não encontrado."
+
+                        });
+
+                    }
+
+
+                    return res.json({
+
+                        canal,
+
+                        usuario:{
+
+                            numero:
+                            voluntario.numero
+
+                        },
+
+                        dashboard:{
+
+                            saldoAtual:
+                            voluntario.saldo,
+
+                            participacoes:
+                            voluntario.participacoes.length,
+
+                            transacoes:
+                            voluntario.transacoes.length
+
+                        },
+
+                        response:
+                        "Dashboard do voluntário carregado."
+
+                    });
+
+
+                }
+
+
+                return res.json({
 
                     canal,
 
-                    identificador,
+                    response:
+                    "Comando recebido. Em breve novas funcionalidades estarão disponíveis.",
 
-                    mensagem:
-                    req.body.mensagem || ""
+                    comando
 
                 });
+
+            }
 
 
 
@@ -53,22 +134,6 @@ module.exports = function(prisma) {
 
                         numero:
                         identificador
-
-                    },
-
-                    include: {
-
-                        participacoes: {
-
-                            include: {
-
-                                acao:true
-
-                            }
-
-                        },
-
-                        transacoes:true
 
                     }
 
@@ -97,94 +162,31 @@ module.exports = function(prisma) {
 
 
 
-            switch(comando.comando) {
+            return res.json({
 
+                canal,
 
-                case "CONSULTAR_SALDO":
+                usuario: {
 
+                    numero:
+                    voluntario.numero
 
-                    return res.json({
+                },
 
-                        canal,
+                response:
+                `Seu saldo atual é de ${voluntario.saldo} bônus-horas.`,
 
-                        usuario: {
+                opcoes:[
 
-                            numero:
-                            voluntario.numero
+                    "Ver Benefícios Disponíveis",
 
-                        },
+                    "Ver Dashboard",
 
-                        response:
-                        `Seu saldo atual é de ${voluntario.saldo} bônus-horas.`,
+                    "Voltar ao Menu"
 
-                        opcoes:[
+                ]
 
-                            "Ver Benefícios Disponíveis",
-
-                            "Ver Dashboard",
-
-                            "Voltar ao Menu"
-
-                        ]
-
-                    });
-
-
-
-                case "CONSULTAR_DASHBOARD":
-
-
-                    return res.json({
-
-                        canal,
-
-                        usuario: {
-
-                            numero:
-                            voluntario.numero
-
-                        },
-
-                        dashboard: {
-
-                            saldoAtual:
-                            voluntario.saldo,
-
-
-                            participacoes:
-                            voluntario.participacoes.length,
-
-
-                            transacoes:
-                            voluntario.transacoes.length
-
-                        },
-
-
-                        response:
-                        "Dashboard do voluntário carregado."
-
-                    });
-
-
-
-                default:
-
-
-                    return res.json({
-
-                        canal,
-
-                        response:
-                        "Comando recebido. Em breve novas funcionalidades estarão disponíveis.",
-
-                        comando:
-                        comando.comando
-
-                    });
-
-
-            }
+            });
 
 
 
