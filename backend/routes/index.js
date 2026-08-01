@@ -13,6 +13,7 @@ const healthRoute = require('./health');
 const ledgerRoute = require('./ledger');
 const executiveRoute = require('./executive');
 const sciRoutes = require('./sci');
+const dashboardRoute = require('./dashboard');
 
 module.exports = function(prisma) {
 
@@ -79,6 +80,11 @@ module.exports = function(prisma) {
     router.use(
         '/executive',
         executiveRoute(prisma)
+    );
+
+    router.use(
+        '/dashboard',
+        dashboardRoute(prisma)
     );
 
     return router;
