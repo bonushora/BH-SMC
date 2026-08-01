@@ -14,6 +14,7 @@ const ledgerRoute = require('./ledger');
 const executiveRoute = require('./executive');
 const sciRoutes = require('./sci');
 const dashboardRoute = require('./dashboard');
+const auditoriaRoute = require('./auditoria');
 
 module.exports = function(prisma) {
 
@@ -85,6 +86,11 @@ module.exports = function(prisma) {
     router.use(
         '/dashboard',
         dashboardRoute(prisma)
+    );
+
+    router.use(
+        '/auditoria',
+        auditoriaRoute(prisma)
     );
 
     return router;
