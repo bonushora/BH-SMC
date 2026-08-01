@@ -11,78 +11,76 @@ const execucoesRoute = require('./execucoes');
 const coordenadoresRoute = require('./coordenadores');
 const healthRoute = require('./health');
 const ledgerRoute = require('./ledger');
-
+const executiveRoute = require('./executive');
+const sciRoutes = require('./sci');
 
 module.exports = function(prisma) {
-
 
     router.use(
         '/bi',
         metricsRoutes(prisma)
     );
 
-
     router.use(
         '/transacoes',
         transacoesRoute(prisma)
     );
-
 
     router.use(
         '/homologacao',
         homologacaoRoute(prisma)
     );
 
-
     router.use(
         '/voluntarios',
         voluntariosRoute(prisma)
     );
-
 
     router.use(
         '/chat',
         chatRoute(prisma)
     );
 
-
     router.use(
         '/acoes',
         acoesRoute(prisma)
     );
-
 
     router.use(
         '/participacoes',
         participacoesRoute(prisma)
     );
 
-
     router.use(
         '/execucoes',
         execucoesRoute(prisma)
     );
-
 
     router.use(
         '/coordenadores',
         coordenadoresRoute(prisma)
     );
 
-
-    
     router.use(
         '/health',
         healthRoute(prisma)
     );
-
 
     router.use(
         '/ledger',
         ledgerRoute(prisma)
     );
 
-    return router;
+    router.use(
+        '/sci',
+        sciRoutes(prisma)
+    );
 
+    router.use(
+        '/executive',
+        executiveRoute(prisma)
+    );
+
+    return router;
 
 };
