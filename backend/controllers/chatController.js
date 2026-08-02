@@ -7,6 +7,9 @@ const chatResponse =
 const homologacaoService =
     require('../services/homologacaoService');
 
+const chatSession =
+    require('../services/chat/chatSession');
+
 
 module.exports = function(prisma) {
 
@@ -34,9 +37,54 @@ module.exports = function(prisma) {
             }
 
 
+            const mensagem =
+                req.body.mensagem || "";
+
+
+            const sessao =
+                chatSession.get(identificador);
+
+
+            console.log(
+                "[CHAT SESSION]",
+                identificador,
+                sessao
+            );
+
+
+            if (
+                sessao &&
+                sessao.estado === "AGUARDANDO_TIPO_BENEFICIO"
+            ) {
+
+                const resultado =
+                    await homologacaoService.processResgate(
+                        prisma,
+                        {
+                            whatsapp: identificador,
+                            tipoBeneficio:
+                                mensagem.trim().toUpperCase()
+                        }
+                    );
+
+
+                chatSession.clear(identificador);
+
+
+                return res.json({
+
+                    canal,
+
+                    ...resultado
+
+                });
+
+            }
+
+
             const comando =
                 chatCommands.interpretar(
-                    req.body.mensagem || ""
+                    mensagem
                 );
 
 
@@ -272,6 +320,15 @@ module.exports = function(prisma) {
             if (
                 comando === "RESGATAR_BENEFICIO"
             ) {
+
+                chatSession.set(
+                    identificador,
+                    {
+                        estado:
+                        "AGUARDANDO_TIPO_BENEFICIO"
+                    }
+                );
+
 
                 const beneficios =
                     await prisma.beneficio.findMany({
