@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: bh-smc-secIS
+    runtime: node
+    plan: free
+
+    buildCommand: npm install
+
+    startCommand: npm start
+
+    healthCheckPath: /api/health
+
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+
+      - key: DIRECT_URL
+        sync: false
