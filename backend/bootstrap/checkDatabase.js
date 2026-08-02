@@ -8,7 +8,7 @@ module.exports = async function checkDatabase() {
     console.log("Verificando PostgreSQL central...");
     console.log("");
 
-    for (let tentativa = 1; tentativa <= 30; tentativa++) {
+    for (let tentativa = 1; tentativa <= 5; tentativa++) {
 
         try {
 
@@ -21,9 +21,7 @@ module.exports = async function checkDatabase() {
 
             await client.connect();
 
-            await client.query(
-                "SELECT 1"
-            );
+            await client.query("SELECT 1");
 
             await client.end();
 
@@ -37,12 +35,12 @@ module.exports = async function checkDatabase() {
 
         } catch (error) {
 
-            process.stdout.write(
-                `Tentativa ${tentativa}/30 aguardando banco...\r`
+            console.log(
+                `Tentativa ${tentativa}/5 falhou: ${error.message}`
             );
 
             await new Promise(
-                resolve => setTimeout(resolve, 2000)
+                resolve => setTimeout(resolve, 3000)
             );
 
         }
@@ -50,7 +48,7 @@ module.exports = async function checkDatabase() {
     }
 
     throw new Error(
-        "PostgreSQL central indisponível após 30 tentativas."
+        "PostgreSQL central indisponível após tentativas de diagnóstico."
     );
 
 };
