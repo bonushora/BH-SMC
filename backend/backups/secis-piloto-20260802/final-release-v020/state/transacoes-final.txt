@@ -1,0 +1,9 @@
+ id | voluntarioId | horas |  tipo   |                     descricao                     |        criadoEm         | execucaoId 
+----+--------------+-------+---------+---------------------------------------------------+-------------------------+------------
+  1 |            1 |     5 | BONUS   | Participação em ação socioambiental piloto        | 2026-08-02 05:27:37.998 |          1
+  2 |            1 |    -5 | RESGATE | Resgate homologado: Desconto em comércio parceiro | 2026-08-02 12:28:43.166 |           
+  3 |            1 |    -5 | RESGATE | Resgate homologado: Desconto em comércio parceiro | 2026-08-02 13:04:57.534 |           
+  4 |            1 |    -5 | RESGATE | Resgate homologado: Desconto em comércio parceiro | 2026-08-02 13:23:56.156 |           
+  5 |            1 |    30 | GENESIS | Crédito inicial do piloto BônusHora SECIS         | 2026-08-02 17:41:48.593 |           
+(5 linhas)
+
