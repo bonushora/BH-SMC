@@ -5,15 +5,11 @@ module.exports = function checkEnv() {
 
     const envPath = path.join(__dirname, "..", ".env");
 
-    if (!fs.existsSync(envPath)) {
-        throw new Error(
-            "Arquivo .env não encontrado."
-        );
+    if (fs.existsSync(envPath)) {
+        require("dotenv").config({
+            path: envPath
+        });
     }
-
-    require("dotenv").config({
-        path: envPath
-    });
 
     const required = [
         "DATABASE_URL",
@@ -32,31 +28,6 @@ module.exports = function checkEnv() {
             );
 
         }
-
-    }
-
-    const url = process.env.DATABASE_URL;
-
-    if (
-        url.includes("pooler.supabase.com") ||
-        url.includes("supabase.co")
-    ) {
-
-        throw new Error(
-            [
-                "",
-                "======================================================",
-                "ERRO DE SEGURANÇA",
-                "",
-                "O backend está apontando para um banco Supabase Cloud.",
-                "",
-                "O BH-SMC utiliza como fonte da verdade",
-                "o PostgreSQL CENTRAL local.",
-                "",
-                "Corrija DATABASE_URL antes de iniciar.",
-                "======================================================"
-            ].join("\n")
-        );
 
     }
 
