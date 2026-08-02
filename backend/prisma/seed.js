@@ -1,20 +1,29 @@
 require("dotenv").config();
-const prisma = require("../database/prisma");
+
+const prisma =
+    require("../database/prisma");
 
 
 async function main() {
 
-
-    console.log("🌱 Iniciando seed BH-SMC MVP");
+    console.log(
+        "🌱 Iniciando seed BH-SMC MVP"
+    );
 
 
     await prisma.transacao.deleteMany();
+
     await prisma.execucaoParticipacao.deleteMany();
+
     await prisma.participacao.deleteMany();
-    await prisma.acao.deleteMany();
+
     await prisma.beneficio.deleteMany();
-    await prisma.voluntario.deleteMany();
+
+    await prisma.acao.deleteMany();
+
     await prisma.coordenador.deleteMany();
+
+    await prisma.voluntario.deleteMany();
 
 
 
@@ -22,11 +31,13 @@ async function main() {
         await prisma.coordenador.create({
 
             data:{
+
                 nome:
-                "SECIS Salvador Piloto",
+                "Coordenador SECIS",
 
                 telefone:
-                "71990000000"
+                "71988888888"
+
             }
 
         });
@@ -37,11 +48,13 @@ async function main() {
         await prisma.voluntario.create({
 
             data:{
+
                 numero:
                 "71999999999",
 
                 saldo:
                 0
+
             }
 
         });
@@ -88,7 +101,10 @@ async function main() {
                 5,
 
                 coordenadorId:
-                coordenador.id
+                coordenador.id,
+
+                ativo:
+                true
 
             }
 
@@ -111,7 +127,6 @@ async function main() {
                 5
             },
 
-
             {
                 tipo:
                 "EVENTO_SECIS",
@@ -122,7 +137,6 @@ async function main() {
                 custoHoras:
                 10
             },
-
 
             {
                 tipo:
@@ -215,26 +229,71 @@ async function main() {
 
 
 
+    /*
+      Reconciliação determinística:
+      Ledger é a fonte da verdade.
+    */
 
-    console.log("✅ Seed BH-SMC MVP concluído");
+
+    const saldoLedger =
+        await prisma.transacao.aggregate({
+
+            where:{
+
+                voluntarioId:
+                voluntario.id
+
+            },
+
+            _sum:{
+
+                horas:true
+
+            }
+
+        });
+
+
+
+    await prisma.voluntario.update({
+
+        where:{
+
+            id:
+            voluntario.id
+
+        },
+
+        data:{
+
+            saldo:
+            saldoLedger._sum.horas || 0
+
+        }
+
+    });
+
+
+
+    console.log(
+        "✅ Seed BH-SMC MVP concluído"
+    );
 
 }
 
 
 main()
 
-.then(async()=>{
-
-    await prisma.$disconnect();
-
-})
-
-.catch(async(error)=>{
+.catch(error => {
 
     console.error(error);
 
-    await prisma.$disconnect();
-
     process.exit(1);
+
+})
+
+.finally(async () => {
+
+    await prisma.$disconnect();
 
 });
