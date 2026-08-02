@@ -16,16 +16,15 @@ model Voluntario {
 }
 
 model Transacao {
-  id           Int      @id @default(autoincrement())
+  id           Int                   @id @default(autoincrement())
   voluntarioId Int
-  execucaoId   Int?
   horas        Float
   tipo         String
   descricao    String
-  criadoEm     DateTime @default(now())
-
-  voluntario Voluntario            @relation(fields: [voluntarioId], references: [id])
-  execucao   ExecucaoParticipacao? @relation(fields: [execucaoId], references: [id])
+  criadoEm     DateTime              @default(now())
+  execucaoId   Int?
+  execucao     ExecucaoParticipacao? @relation(fields: [execucaoId], references: [id])
+  voluntario   Voluntario            @relation(fields: [voluntarioId], references: [id])
 }
 
 model Beneficio {
@@ -69,16 +68,15 @@ model Participacao {
 }
 
 model ExecucaoParticipacao {
-  id              Int       @id @default(autoincrement())
-  participacaoId  Int       @unique
+  id              Int          @id @default(autoincrement())
+  participacaoId  Int          @unique
   checkinEm       DateTime?
   checkoutEm      DateTime?
-  horasRealizadas Float     @default(0)
+  horasRealizadas Float        @default(0)
   latitude        Float?
   longitude       Float?
-  status          String    @default("INICIADA")
-  criadoEm        DateTime  @default(now())
-
-  participacao Participacao @relation(fields: [participacaoId], references: [id])
-  transacoes   Transacao[]
+  status          String       @default("INICIADA")
+  criadoEm        DateTime     @default(now())
+  participacao    Participacao @relation(fields: [participacaoId], references: [id])
+  transacoes      Transacao[]
 }
