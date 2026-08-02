@@ -17,6 +17,7 @@ const dashboardRoute = require('./dashboard');
 const auditoriaRoute = require('./auditoria');
 const beneficiosRoute = require('./beneficios');
 const auditoriaLedgerRoute = require('./auditoriaLedger');
+const proofRoute = require('./proof');
 
 module.exports = function(prisma) {
 
@@ -103,6 +104,11 @@ module.exports = function(prisma) {
     router.use(
         '/beneficios',
         beneficiosRoute(prisma)
+    );
+
+    router.use(
+        '/proof',
+        proofRoute(prisma)
     );
 
     return router;
