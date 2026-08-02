@@ -13,7 +13,10 @@ module.exports = async function checkDatabase() {
         try {
 
             const client = new Client({
-                connectionString: DATABASE_URL
+                connectionString: DATABASE_URL,
+                ssl: {
+                    rejectUnauthorized: false
+                }
             });
 
             await client.connect();
