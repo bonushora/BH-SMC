@@ -1,3 +1,4 @@
+require("dotenv").config();
 const prisma = require("../database/prisma");
 
 
@@ -40,10 +41,32 @@ async function main() {
                 "71999999999",
 
                 saldo:
-                30
+                0
             }
 
         });
+
+
+
+    await prisma.transacao.create({
+
+        data:{
+
+            voluntarioId:
+            voluntario.id,
+
+            horas:
+            30,
+
+            tipo:
+            "GENESIS",
+
+            descricao:
+            "Crédito inicial do piloto BônusHora SECIS"
+
+        }
+
+    });
 
 
 
@@ -190,21 +213,6 @@ async function main() {
 
     });
 
-
-
-    await prisma.voluntario.update({
-
-        where:{
-            id:
-            voluntario.id
-        },
-
-        data:{
-            saldo:
-            35
-        }
-
-    });
 
 
 
