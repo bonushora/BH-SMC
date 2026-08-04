@@ -30,3 +30,5 @@ docker_db_estado.json
 .env*
 *.backup.*
 *.dump
+supabase-cloud-schema.sql
+test-supabase.js
