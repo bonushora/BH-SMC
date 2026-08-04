@@ -32,3 +32,5 @@ docker_db_estado.json
 *.dump
 supabase-cloud-schema.sql
 test-supabase.js
+supabase-cloud-schema.sql
+test-supabase.js
