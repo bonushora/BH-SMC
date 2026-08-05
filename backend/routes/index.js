@@ -5,6 +5,7 @@ const transacoesRoute = require('./transacoes');
 const homologacaoRoute = require('./homologacao');
 const voluntariosRoute = require('./voluntarios');
 const chatRoute = require('./chat');
+const telegramRoute = require('./telegram');
 const acoesRoute = require('./acoes');
 const participacoesRoute = require('./participacoes');
 const execucoesRoute = require('./execucoes');
@@ -44,6 +45,11 @@ module.exports = function(prisma) {
     router.use(
         '/chat',
         chatRoute(prisma)
+    );
+
+    router.use(
+        '/telegram',
+        telegramRoute(prisma)
     );
 
     router.use(
