@@ -3,12 +3,18 @@ const path = require("path");
 
 module.exports = function checkEnv() {
 
-    const envPath = path.join(__dirname, "..", ".env");
+    const envPath = path.join(
+        __dirname,
+        "..",
+        ".env"
+    );
 
     if (fs.existsSync(envPath)) {
+
         require("dotenv").config({
             path: envPath
         });
+
     }
 
     const required = [
@@ -31,6 +37,8 @@ module.exports = function checkEnv() {
 
     }
 
-    console.log("✓ Ambiente validado.");
+    console.log(
+        "✓ Ambiente validado."
+    );
 
 };
