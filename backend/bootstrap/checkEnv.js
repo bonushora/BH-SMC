@@ -9,6 +9,12 @@ module.exports = function checkEnv() {
         ".env"
     );
 
+    /*
+     * O .env é opcional.
+     *
+     * Em produção (Railway), as variáveis são
+     * fornecidas diretamente por process.env.
+     */
     if (fs.existsSync(envPath)) {
 
         require("dotenv").config({
@@ -40,5 +46,4 @@ module.exports = function checkEnv() {
     console.log(
         "✓ Ambiente validado."
     );
-
 };
