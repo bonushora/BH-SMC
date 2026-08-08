@@ -3,17 +3,25 @@ const path = require("path");
 
 module.exports = function checkEnv() {
 
-    const envPath = path.join(__dirname, "..", ".env");
+    const envPath = path.join(
+        __dirname,
+        "..",
+        ".env"
+    );
 
-    if (!fs.existsSync(envPath)) {
-        throw new Error(
-            "Arquivo .env não encontrado."
-        );
+    /*
+     * O .env é opcional.
+     *
+     * Em produção (Railway), as variáveis são
+     * fornecidas diretamente por process.env.
+     */
+    if (fs.existsSync(envPath)) {
+
+        require("dotenv").config({
+            path: envPath
+        });
+
     }
-
-    require("dotenv").config({
-        path: envPath
-    });
 
     const required = [
         "DATABASE_URL",
@@ -37,6 +45,13 @@ module.exports = function checkEnv() {
 
     const url = process.env.DATABASE_URL;
 
+    /*
+     * Proteção contra apontamento acidental
+     * para Supabase Cloud.
+     *
+     * O BH-SMC utiliza como fonte da verdade
+     * o PostgreSQL CENTRAL local.
+     */
     if (
         url.includes("pooler.supabase.com") ||
         url.includes("supabase.co")
@@ -60,6 +75,8 @@ module.exports = function checkEnv() {
 
     }
 
-    console.log("✓ Ambiente validado.");
+    console.log(
+        "✓ Ambiente validado."
+    );
 
 };
